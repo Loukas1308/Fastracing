@@ -25,7 +25,7 @@ catch (PDOException $e) {
 // s'appelle exactement "nos produits", il faut utiliser des `backticks` en SQL)
 try {
     // Si ta table s'appelle "nos_produits" avec un tiret (ce qui est plus classique), modifie la ligne en-dessous en "FROM nos_produits"
-    $requete = $pdo->query('SELECT `nom_commercial`, `prix_htva_eur` FROM `produits`');
+    $requete = $pdo->query('SELECT `nom_commercial`, `prix_htva_eur` FROM `produit`');
     $lesProduits = $requete->fetchAll();
 }
 catch (PDOException $e) {
