@@ -1,9 +1,13 @@
 <?php
 
-$host = 'localhost'; 
-$dbname = 'nheqhpjvcd_FastRacers'; 
-$username = 'nheqhpjvcd_Ceo'; 
-$password = 'H>EV%:|q6|'; 
+$host = 'localhost';
+
+$dbname = 'nheqhpjvcd_FastRacers';
+
+$username = 'nheqhpjvcd_Ceo';
+
+$password = 'H>EV%:|q6|';
+
 
 $options = [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,

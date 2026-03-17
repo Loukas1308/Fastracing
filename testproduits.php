@@ -2,32 +2,33 @@
 require 'connexionDB.php'; // On se connecte à la base de données
 
 try {
-    $requete = $pdo->query('SELECT * FROM `produit`');
-    $produitsBDD = $requete->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    die("Erreur de BDD : " . $e->getMessage());
+  $requete = $pdo->query('SELECT * FROM `produit`');
+  $produitsBDD = $requete->fetchAll(PDO::FETCH_ASSOC);
+}
+catch (PDOException $e) {
+  die("Erreur de BDD : " . $e->getMessage());
 }
 
 // Nettoyage et préparation des données BDD pour le Javascript
 $produitsFormates = [];
 foreach ($produitsBDD as $produit) {
-    // On extrait l'image si elle existe, sinon image par défaut
-    $imageNom = !empty($produit['image']) ? $produit['image'] : (!empty($produit['photo']) ? $produit['photo'] : 'default.png');
-    
-    // On rajoute le produit dans le format attendu par le code JS en le sécurisant
-    $produitsFormates[] = [
-        'id' => $produit['id'] ?? rand(1000, 9999), 
-        'name' => $produit['nom_commercial'] ?? 'Produit Sans Nom',
-        'category' => 'Boutique', // Ou $produit['categorie'] si ça existe
-        'subcategory' => '',
-        'material' => '-', // Ou $produit['matiere']
-        'price' => floatval($produit['prix_htva_eur'] ?? 0),
-        'stock' => true,
-        'rating' => 5.0,
-        'image' => './images/' . $imageNom,
-        'description' => $produit['description'] ?? ($produit['desc'] ?? ''),
-        'badge' => 'Disponible'
-    ];
+  // On extrait l'image si elle existe, sinon image par défaut
+  $imageNom = !empty($produit['image']) ? $produit['image'] : (!empty($produit['photo']) ? $produit['photo'] : 'default.png');
+
+  // On rajoute le produit dans le format attendu par le code JS en le sécurisant
+  $produitsFormates[] = [
+    'id' => $produit['id'] ?? rand(1000, 9999),
+    'name' => $produit['nom_commercial'] ?? 'Produit Sans Nom',
+    'category' => 'Boutique', // Ou $produit['categorie'] si ça existe
+    'subcategory' => '',
+    'material' => '-', // Ou $produit['matiere']
+    'price' => floatval($produit['prix_htva_eur'] ?? 0),
+    'stock' => true,
+    'rating' => 5.0,
+    'image' => './images/' . $imageNom,
+    'description' => $produit['description'] ?? ($produit['desc'] ?? ''),
+    'badge' => 'Disponible'
+  ];
 }
 
 $produitsJSON = json_encode($produitsFormates, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
