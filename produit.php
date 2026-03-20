@@ -1,18 +1,44 @@
+<?php
+require 'connexionDB.php';
+
+// Vérification de l'ID du produit dans l'URL (ex: produit.php?id=1)
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    header('Location: testproduits.php');
+    exit;
+}
+
+$idProduit = $_GET['id'];
+$requete = $pdo->prepare('SELECT * FROM `produit` WHERE id = :id');
+$requete->execute(['id' => $idProduit]);
+$leProduit = $requete->fetch();
+
+// Si le produit n'existe pas dans la base
+if (!$leProduit) {
+    echo "<h2 style='text-align:center; color:white; padding:50px;'>Erreur : Ce produit n'existe pas.</h2><a href='testproduits.php' style='display:block; text-align:center; color:gray;'>Retour à la boutique</a>";
+    exit;
+}
+
+// Gestion de l'image
+$imageNom = !empty($leProduit['image']) ? $leProduit['image'] : (!empty($leProduit['photo']) ? $leProduit['photo'] : 'default.png');
+$cheminImage = './images/' . htmlspecialchars($imageNom);
+
+// Protection des variables texte pour l'affichage
+$nomProduit = htmlspecialchars($leProduit['nom_commercial'] ?? 'Produit Sans Nom');
+$prixProduit = htmlspecialchars($leProduit['prix_htva_eur'] ?? '0');
+$descProduit = htmlspecialchars($leProduit['description'] ?? ($leProduit['desc'] ?? 'Aucune description.'));
+?>
 <!doctype html>
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Volant F1</title>
+  <title><?php echo $nomProduit; ?> - FastRacers</title>
   <link rel="stylesheet" href="./style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="fc">
 
-  <header class="fc-topbar">
-    <a class="fc-back" href="produits.php">← Retour</a>
-    <div class="fc-logo">BOUTIQUE</div>
-    <a class="fc-cart" href="#">Panier</a>
-  </header>
+  <?php include 'header.php'; ?>
 
   <main class="fc-page">
     <section class="fc-product">
@@ -20,21 +46,12 @@
       <!-- Galerie -->
       <div class="fc-gallery">
         <div class="fc-main-img">
-          <img id="mainImg" src="./images/volant_f1.png" alt="Volant F1">
+          <img id="mainImg" src="<?php echo $cheminImage; ?>" alt="<?php echo $nomProduit; ?>">
         </div>
 
         <div class="fc-thumbs">
-          <button class="fc-thumb is-active" onclick="setImg(this,'./images/volant_f1.png')">
-            <img src="./images/volant_f1.png" alt="">
-          </button>
-          <button class="fc-thumb" onclick="setImg(this,'./images/volant_f1.png')">
-            <img src="./images/volant_f1.png" alt="">
-          </button>
-          <button class="fc-thumb" onclick="setImg(this,'./images/volant_f1.png')">
-            <img src="./images/volant_f1.png" alt="">
-          </button>
-          <button class="fc-thumb" onclick="setImg(this,'./images/volant_f1.png')">
-            <img src="./images/volant_f1.png" alt="">
+          <button class="fc-thumb is-active" onclick="setImg(this,'<?php echo $cheminImage; ?>')">
+            <img src="<?php echo $cheminImage; ?>" alt="">
           </button>
         </div>
       </div>
@@ -42,18 +59,16 @@
       <!-- Infos -->
       <div class="fc-info">
         <div class="fc-badges">
-          <span class="fc-badge">SIM RACING</span>
-          <span class="fc-badge">FORMULA</span>
-          <span class="fc-badge">CARBONE</span>
+          <span class="fc-badge">BOUTIQUE</span>
         </div>
 
-        <h1 class="fc-title">Volant F1</h1>
+        <h1 class="fc-title"><?php echo $nomProduit; ?></h1>
         <p class="fc-sub">
-          Volant simracing type Formula en fibre de carbone, poignées en suédine, avec boutons/molettes et LED.
+          <?php echo $descProduit; ?>
         </p>
 
         <div class="fc-priceRow">
-          <div class="fc-price">205,68 €</div>
+          <div class="fc-price"><?php echo $prixProduit; ?> €</div>
           <div class="fc-availability ok">En stock</div>
         </div>
 
@@ -127,5 +142,6 @@
     }
   </script>
 
+  <?php include 'footer.php'; ?>
 </body>
 </html>

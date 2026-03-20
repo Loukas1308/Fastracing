@@ -42,6 +42,10 @@ $produitsJSON = json_encode($produitsFormates, JSON_HEX_TAG | JSON_HEX_APOS | JS
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="min-h-screen bg-[#05070d] text-white">
+    
+  <!-- Inclusion dynamique du Header -->
+  <?php include 'header.php'; ?>
+
     <div class="mx-auto max-w-7xl px-6 py-8 lg:px-10">
       <header class="mb-8 border-b border-white/10 pb-6">
         <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -242,7 +246,7 @@ $produitsJSON = json_encode($produitsFormates, JSON_HEX_TAG | JSON_HEX_APOS | JS
                 <span class="rounded-full px-4 py-2 text-sm font-medium ${product.stock ? 'border border-emerald-500/20 bg-emerald-500/10 text-emerald-300' : 'border border-red-500/20 bg-red-500/10 text-red-300'}">${product.stock ? 'En stock' : 'Indisponible'}</span>
               </div>
               <div class="flex gap-3">
-                <button class="flex-1 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-black transition hover:scale-[0.99]">Voir le produit</button>
+                <a href="produit.php?id=${product.id}" class="flex-1 block text-center rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-black transition hover:scale-[0.99]">Voir le produit</a>
                 <button class="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10">Ajouter</button>
               </div>
             </div>
@@ -303,5 +307,9 @@ $produitsJSON = json_encode($produitsFormates, JSON_HEX_TAG | JSON_HEX_APOS | JS
       buildSelectOptions();
       render();
     </script>
+
+    <!-- Inclusion dynamique du Footer -->
+    <?php include 'footer.php'; ?>
+
   </body>
 </html>
