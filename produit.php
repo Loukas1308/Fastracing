@@ -72,16 +72,15 @@ $descProduit = htmlspecialchars($leProduit['description'] ?? ($leProduit['desc']
           <div class="fc-availability ok">En stock</div>
         </div>
 
-        <div class="fc-actions">
+        <form action="panier.php?action=add&id=<?php echo $idProduit; ?>" method="POST" class="fc-actions" style="margin: 0;">
           <div class="fc-qty">
             <button type="button" class="fc-qtyBtn" onclick="decQty()">−</button>
-            <input id="qty" class="fc-qtyInput" type="number" min="1" value="1">
+            <input id="qty" name="qty" class="fc-qtyInput" type="number" min="1" value="1">
             <button type="button" class="fc-qtyBtn" onclick="incQty()">+</button>
           </div>
 
-          <button class="fc-ctaPrimary">Ajouter au panier</button>
-          <button class="fc-ctaGhost">Acheter maintenant</button>
-        </div>
+          <button type="submit" class="fc-ctaPrimary">Ajouter au panier</button>
+        </form>
 
         <div class="fc-shipping">
           <div class="fc-shipItem"><span>✓</span> Expédition rapide</div>

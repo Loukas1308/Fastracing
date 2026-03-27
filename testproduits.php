@@ -32,6 +32,12 @@ foreach ($produitsBDD as $produit) {
 }
 
 $produitsJSON = json_encode($produitsFormates, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+$panierIds = isset($_SESSION['panier']) ? array_keys($_SESSION['panier']) : [];
+$panierJSON = json_encode(array_values($panierIds));
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -137,6 +143,7 @@ $produitsJSON = json_encode($produitsFormates, JSON_HEX_TAG | JSON_HEX_APOS | JS
     <script>
       // Récupération dynamique des produits depuis PHP
       const products = <?php echo $produitsJSON; ?>;
+      const cartIds = <?php echo $panierJSON; ?>;
 
       const state = {
         search: '',
@@ -223,7 +230,14 @@ $produitsJSON = json_encode($produitsFormates, JSON_HEX_TAG | JSON_HEX_APOS | JS
       }
 
       function renderProducts(filteredProducts) {
-        elements.productsGrid.innerHTML = filteredProducts.map((product) => `
+        elements.productsGrid.innerHTML = filteredProducts.map((product) => {
+          const inCart = cartIds.includes(product.id) || cartIds.includes(product.id.toString());
+          const btnClass = inCart 
+              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/50" 
+              : "border-white/10 bg-white/[0.03] text-white hover:bg-white/10";
+          const btnText = inCart ? "Ajouté ✓" : "Ajouter";
+
+          return `
           <article class="group overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.03] shadow-[0_20px_80px_rgba(0,0,0,0.45)] transition hover:-translate-y-1 hover:border-white/20">
             <div class="relative aspect-[1.15/1] overflow-hidden border-b border-white/10 bg-[#070b14]">
               <img src="${product.image}" alt="${product.name}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
@@ -247,11 +261,11 @@ $produitsJSON = json_encode($produitsFormates, JSON_HEX_TAG | JSON_HEX_APOS | JS
               </div>
               <div class="flex gap-3">
                 <a href="produit.php?id=${product.id}" class="flex-1 block text-center rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-black transition hover:scale-[0.99]">Voir le produit</a>
-                <button class="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10">Ajouter</button>
+                <button type="button" onclick="addToCart(event, ${product.id})" class="rounded-2xl border px-4 py-3 text-sm font-semibold transition flex items-center justify-center w-28 ${btnClass}">${btnText}</button>
               </div>
             </div>
           </article>
-        `).join('');
+        `}).join('');
       }
 
       function render() {
@@ -303,6 +317,46 @@ $produitsJSON = json_encode($produitsFormates, JSON_HEX_TAG | JSON_HEX_APOS | JS
         state.stockOnly = e.target.checked;
         render();
       });
+
+      function addToCart(event, productId) {
+        event.preventDefault();
+        
+        const btn = event.currentTarget;
+        
+        // Mettre à jour visuellement le bouton de façon permanente
+        btn.innerHTML = "Ajouté ✓";
+        btn.className = "rounded-2xl border px-4 py-3 text-sm font-semibold transition flex items-center justify-center w-28 bg-emerald-500/20 text-emerald-400 border-emerald-500/50";
+        
+        // L'enregistrer dans la liste locale pour ne pas perdre la couleur au prochain filtrage/recherche
+        if (!cartIds.includes(productId) && !cartIds.includes(productId.toString())) {
+            cartIds.push(productId);
+        }
+
+        // Envoyer la donnée silencieusement (AJAX)
+        fetch(`panier.php?action=add&id=${productId}&ajax=1`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'success') {
+                updateCartBadge(data.cartCount);
+            }
+          })
+          .catch(error => console.error('Erreur ajout panier:', error));
+      }
+
+      function updateCartBadge(count) {
+          const cartLink = document.querySelector('a[href="panier.php"]');
+          if (cartLink) {
+              let badge = cartLink.querySelector('span.absolute');
+              if (!badge && count > 0) {
+                  badge = document.createElement('span');
+                  badge.className = "absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white";
+                  cartLink.appendChild(badge);
+              }
+              if (badge) {
+                  badge.textContent = count;
+              }
+          }
+      }
 
       buildSelectOptions();
       render();

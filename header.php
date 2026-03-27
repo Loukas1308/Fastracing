@@ -1,3 +1,14 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+$cartCount = 0;
+if (isset($_SESSION['panier']) && is_array($_SESSION['panier'])) {
+    foreach ($_SESSION['panier'] as $qty) {
+        $cartCount += $qty;
+    }
+}
+?>
 <header class="sticky top-0 z-50 w-full border-b border-white/10 bg-[#05070d]/80 backdrop-blur-md">
   <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
     
@@ -20,8 +31,11 @@
       <a href="compte.php" class="transition hover:text-white" aria-label="Mon Compte">
         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
       </a>
-      <a href="panier.php" class="flex items-center gap-2 transition hover:text-white" aria-label="Mon Panier">
+      <a href="panier.php" class="relative flex items-center gap-2 transition hover:text-white" aria-label="Mon Panier">
         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+        <?php if($cartCount > 0): ?>
+          <span class="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white"><?php echo $cartCount; ?></span>
+        <?php endif; ?>
       </a>
     </div>
     
